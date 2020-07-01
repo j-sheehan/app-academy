@@ -126,7 +126,14 @@ puts
 # positive integer that can be obtained by multiplying two prime numbers.
 
 def bi_prime?(num)
-    
+    (2...num).each do |i|
+        if num % i == 0 && !((2...i).any? { |x| i % x == 0 })
+            j = num / i
+            return true if !((2...j).any? { |x| j % x == 0 })
+        end
+    end
+
+    false
 end
 
 # Examples
@@ -148,6 +155,15 @@ puts
 # consists of only lowercase alphabetic characters.
 
 def vigenere_cipher(message, keys)
+    alphabet = ("a".."z").to_a
+    encrypted = ""
+
+    message.each_char.with_index do |char, idx|
+        shift = keys[idx % keys.length]
+        encrypted += alphabet[(alphabet.index(char) + shift) % 26]
+    end
+
+    encrypted
 end
 
 # Examples
@@ -169,6 +185,16 @@ puts
 # replaced with the last vowel.
 
 def vowel_rotate(str)
+    vowels = "aeiou"
+    str_vowels = []
+    str.each_char { |char| str_vowels << char if vowels.include?(char) }
+    str_vowels.unshift(str_vowels.pop)
+    
+    str.each_char.with_index do |char, idx|
+        str[idx] = str_vowels.shift if vowels.include?(char)
+    end
+
+    str
 end
 
 # Examples
@@ -191,11 +217,16 @@ puts
 # then return the empty string. Do not use the built-in Array#select in your solution.
 
 class String
-
     def select(&prc)
-        prc ||= nil
-    end
+        return "" if prc == nil
+        selected = ""
 
+        self.each_char do |char|
+            selected += char if prc.call(char)
+        end
+
+        selected
+    end
 end
 
 # Examples
@@ -217,9 +248,14 @@ puts
 class String
 
     def map!(&prc)
-        prc ||= nil
-    end
+        return self if prc == nil
 
+        self.each_char.with_index do |char, idx|
+            self[idx] = prc.call(char, idx)
+        end
+
+        self
+    end
 end
 
 # Examples
